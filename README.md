@@ -1,221 +1,221 @@
 ﻿# Mini Vercel
 
-A self-hosted frontend deployment platform inspired by Vercel. Deploy, preview, and manage frontend applications with automatic builds, custom domains, SSL certificates, edge functions, and real-time analytics.
+一款受 Vercel 启发的自托管前端部署平台。支持自动构建、预览部署、自定义域名、SSL 证书、Edge Functions 和实时分析。
 
-## Features
+## 功能特性
 
-- **Multi-Framework Support** — Auto-detection and builds for Next.js, Vite, Nuxt, Remix, Gatsby, Astro, SvelteKit, React App, Vue CLI, and generic Node.js
-- **Preview Deployments** — Every branch push creates a unique preview URL
-- **Custom Domains** — Map any domain with automatic DNS verification
-- **SSL Certificates** — Self-signed certificate generation with auto-renewal
-- **Edge Functions** — Run serverless functions in a V8 sandbox with cold-start tracking
-- **Environment Variables** — AES-256-GCM encrypted env var storage per project
-- **Real-time Build Logs** — SSE-based log streaming during builds
-- **Analytics** — Traffic stats, performance metrics (TTFB/FCP/LCP), and error tracking
-- **Authentication** — JWT-based auth with access + refresh token rotation
-- **GitHub/GitLab Integration** — Webhook-driven deployments from connected repositories
+- **多框架支持** — 自动检测并构建 Next.js、Vite、Nuxt、Remix、Gatsby、Astro、SvelteKit、React App、Vue CLI 和通用 Node.js 项目
+- **预览部署** — 每次分支推送自动创建唯一的预览 URL
+- **自定义域名** — 绑定任意域名，自动 DNS 验证
+- **SSL 证书** — 自动生成自签名证书，支持自动续期
+- **Edge Functions** — 在 V8 沙箱中运行无服务器函数，追踪冷启动
+- **环境变量** — 项目级 AES-256-GCM 加密存储环境变量
+- **实时构建日志** — 基于 SSE 的构建日志流
+- **数据分析** — 流量统计、性能指标（TTFB/FCP/LCP）和错误追踪
+- **身份认证** — 基于 JWT 的认证，Access + Refresh Token 轮换
+- **GitHub/GitLab 集成** — 通过 Webhook 驱动的自动部署
 
-## Prerequisites
+## 环境要求
 
 - **Node.js** ≥ 20
-- **PostgreSQL** ≥ 14 (or use Docker Compose)
+- **PostgreSQL** ≥ 14（或使用 Docker Compose）
 - **npm** ≥ 10
 
-## Quick Start
+## 快速开始
 
 ```bash
-# Clone the repo
+# 克隆仓库
 git clone <repo-url> mini-vercel && cd mini-vercel
 
-# Install dependencies
+# 安装依赖
 npm install
 
-# Configure environment
+# 配置环境变量
 cp .env.example .env
-# Edit .env with your settings
+# 编辑 .env 填写你的配置
 
-# Generate Prisma client
+# 生成 Prisma Client
 npx prisma generate
 
-# Push schema to database
+# 推送 Schema 到数据库
 npx prisma db push
 
-# Seed demo data
+# 初始化演示数据
 npx ts-node prisma/seed.ts
 
-# Start development server
+# 启动开发服务器
 npm run dev
 ```
 
-The API will be available at `http://localhost:3000`.
+API 将在 `http://localhost:3000` 可用。
 
-## Docker Deployment
+## Docker 部署
 
 ```bash
-# Start all services (API + PostgreSQL)
+# 启动所有服务（API + PostgreSQL）
 docker compose up -d
 
-# Run database migrations
+# 运行数据库迁移
 docker compose exec app npx prisma db push
 
-# Seed demo data
+# 初始化演示数据
 docker compose exec app npx ts-node prisma/seed.ts
 
-# View logs
+# 查看日志
 docker compose logs -f app
 
-# Stop services
+# 停止服务
 docker compose down
 ```
 
-## API Endpoints
+## API 端点
 
-### Authentication
+### 认证
 
-| Method | Endpoint                      | Description              |
-| ------ | ----------------------------- | ------------------------ |
-| POST   | `/api/auth/register`          | Register new user        |
-| POST   | `/api/auth/login`             | Login                    |
-| POST   | `/api/auth/refresh`           | Refresh access token     |
-| GET    | `/api/auth/me`                | Get current user profile |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/auth/register` | 用户注册 |
+| POST | `/api/auth/login` | 登录 |
+| POST | `/api/auth/refresh` | 刷新 Access Token |
+| GET | `/api/auth/me` | 获取当前用户信息 |
 
-### Projects
+### 项目
 
-| Method | Endpoint                  | Description           |
-| ------ | ------------------------- | --------------------- |
-| POST   | `/api/projects`           | Create project        |
-| GET    | `/api/projects`           | List projects         |
-| GET    | `/api/projects/:id`       | Get project           |
-| PATCH  | `/api/projects/:id`       | Update project        |
-| DELETE | `/api/projects/:id`       | Delete project        |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/projects` | 创建项目 |
+| GET | `/api/projects` | 列出项目 |
+| GET | `/api/projects/:id` | 获取项目 |
+| PATCH | `/api/projects/:id` | 更新项目 |
+| DELETE | `/api/projects/:id` | 删除项目 |
 
-### Deployments
+### 部署
 
-| Method | Endpoint                              | Description               |
-| ------ | ------------------------------------- | ------------------------- |
-| POST   | `/api/deployments`                    | Create deployment         |
-| GET    | `/api/deployments/:id`                | Get deployment            |
-| GET    | `/api/projects/:id/deployments`       | List project deployments  |
-| DELETE | `/api/deployments/:id`                | Delete deployment         |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/deployments` | 创建部署 |
+| GET | `/api/deployments/:id` | 获取部署 |
+| GET | `/api/projects/:id/deployments` | 列出项目部署 |
+| DELETE | `/api/deployments/:id` | 删除部署 |
 
-### Domains
+### 域名
 
-| Method | Endpoint                          | Description          |
-| ------ | --------------------------------- | -------------------- |
-| POST   | `/api/domains`                    | Add custom domain    |
-| GET    | `/api/domains`                    | List domains         |
-| POST   | `/api/domains/:id/verify`         | Trigger DNS verify   |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/domains` | 添加自定义域名 |
+| GET | `/api/domains` | 列出域名 |
+| POST | `/api/domains/:id/verify` | 触发 DNS 验证 |
 
-### Environment Variables
+### 环境变量
 
-| Method | Endpoint                       | Description            |
-| ------ | ------------------------------ | ---------------------- |
-| POST   | `/api/env`                     | Set env variable       |
-| GET    | `/api/env`                     | List env variables     |
-| DELETE | `/api/env/:id`                 | Delete env variable    |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/env` | 设置环境变量 |
+| GET | `/api/env` | 列出环境变量 |
+| DELETE | `/api/env/:id` | 删除环境变量 |
 
 ### Edge Functions
 
-| Method | Endpoint                            | Description             |
-| ------ | ----------------------------------- | ----------------------- |
-| POST   | `/api/functions`                    | Create edge function    |
-| POST   | `/api/functions/:id/invoke`         | Invoke edge function    |
-| GET    | `/api/functions/:id/logs`           | Get function logs       |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/functions` | 创建 Edge Function |
+| POST | `/api/functions/:id/invoke` | 调用 Edge Function |
+| GET | `/api/functions/:id/logs` | 获取函数日志 |
 
-### Analytics
+### 分析
 
-| Method | Endpoint                          | Description            |
-| ------ | --------------------------------- | ---------------------- |
-| GET    | `/api/analytics/traffic`          | Traffic stats          |
-| GET    | `/api/analytics/performance`      | Performance metrics    |
-| GET    | `/api/analytics/errors`           | Error statistics       |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/analytics/traffic` | 流量统计 |
+| GET | `/api/analytics/performance` | 性能指标 |
+| GET | `/api/analytics/errors` | 错误统计 |
 
-### Health
+### 健康检查
 
-| Method | Endpoint           | Description  |
-| ------ | ------------------ | ------------ |
-| GET    | `/api/health`      | Health check |
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/health` | 健康检查 |
 
-## Testing
+## 测试
 
-### Unit Tests (Vitest)
+### 单元测试（Vitest）
 
 ```bash
-# Run all unit tests
+# 运行所有单元测试
 npm test
 
-# Run with coverage
+# 生成覆盖率报告
 npx vitest run --coverage
 
-# Run in watch mode
+# 监听模式
 npx vitest
 ```
 
-### E2E Tests (Playwright)
+### E2E 测试（Playwright）
 
 ```bash
-# Install Playwright browsers
+# 安装 Playwright 浏览器
 npx playwright install chromium
 
-# Run E2E tests (starts dev server automatically)
+# 运行 E2E 测试（自动启动开发服务器）
 npx playwright test
 
-# Run with UI mode
+# 交互式 UI 模式
 npx playwright test --ui
 
-# View HTML report
+# 查看 HTML 报告
 npx playwright show-report e2e-report
 ```
 
-## Project Structure
+## 项目结构
 
 ```
 mini-vercel/
 ├── src/
-│   ├── generated/          # Prisma generated client
-│   ├── lib/                # Database client
-│   ├── middleware/          # Auth middleware
-│   ├── routes/             # Express route handlers
-│   ├── services/           # Business logic
-│   ├── types/              # TypeScript types
-│   ├── app.ts              # Express app setup
-│   └── index.ts            # Server entry point
+│   ├── generated/          # Prisma 生成的客户端
+│   ├── lib/                # 数据库客户端
+│   ├── middleware/          # 认证中间件
+│   ├── routes/             # Express 路由处理器
+│   ├── services/           # 业务逻辑
+│   ├── types/              # TypeScript 类型定义
+│   ├── app.ts              # Express 应用配置
+│   └── index.ts            # 服务端入口
 ├── prisma/
-│   ├── schema.prisma       # Database schema
-│   └── seed.ts             # Demo data seeder
-├── src/__tests__/          # Unit tests (Vitest)
-├── e2e/                    # E2E tests (Playwright)
-├── Dockerfile              # Multi-stage Docker build
-├── docker-compose.yml      # App + PostgreSQL
-├── vitest.config.ts        # Vitest configuration
-├── playwright.config.ts    # Playwright configuration
-└── tsconfig.json           # TypeScript configuration
+│   ├── schema.prisma       # 数据库 Schema
+│   └── seed.ts             # 演示数据填充
+├── src/__tests__/          # 单元测试（Vitest）
+├── e2e/                    # E2E 测试（Playwright）
+├── Dockerfile              # 多阶段 Docker 构建
+├── docker-compose.yml      # 应用 + PostgreSQL
+├── vitest.config.ts        # Vitest 配置
+├── playwright.config.ts    # Playwright 配置
+└── tsconfig.json           # TypeScript 配置
 ```
 
-## Environment Variables
+## 环境变量
 
-See `.env.example` for all configuration options. Key variables:
+完整配置请查看 `.env.example`。关键变量：
 
-| Variable             | Description                          | Default                        |
-| -------------------- | ------------------------------------ | ------------------------------ |
-| `DATABASE_URL`       | PostgreSQL connection string         | `postgresql://...`             |
-| `JWT_SECRET`         | Secret for JWT signing               | (required)                     |
-| `JWT_EXPIRES_IN`     | Access token lifetime                | `7d`                           |
-| `ENV_ENCRYPTION_KEY` | 32-byte hex key for env var encryption | (required)                  |
-| `CORS_ORIGIN`        | Allowed CORS origin                  | `http://localhost:3001`        |
-| `PORT`               | Server port                          | `3000`                         |
+| 变量 | 描述 | 默认值 |
+|------|------|--------|
+| `DATABASE_URL` | PostgreSQL 连接字符串 | `postgresql://...` |
+| `JWT_SECRET` | JWT 签名密钥 | （必填） |
+| `JWT_EXPIRES_IN` | Access Token 有效期 | `7d` |
+| `ENV_ENCRYPTION_KEY` | 32 字节十六进制加密密钥 | （必填） |
+| `CORS_ORIGIN` | 允许的 CORS 来源 | `http://localhost:3001` |
+| `PORT` | 服务端口 | `3000` |
 
-## Tech Stack
+## 技术栈
 
-- **Runtime**: Node.js 20 + TypeScript
-- **Framework**: Express 5
-- **Database**: PostgreSQL 16 + Prisma ORM 7
-- **Auth**: JWT (jsonwebtoken) + bcryptjs
-- **Sandbox**: Node.js `vm` module for edge functions
-- **SSL**: Self-signed certificates via Node.js `crypto`
-- **Testing**: Vitest (unit) + Playwright (E2E)
-- **Deployment**: Multi-stage Docker + Docker Compose
+- **运行时**：Node.js 20 + TypeScript
+- **框架**：Express 5
+- **数据库**：PostgreSQL 16 + Prisma ORM 7
+- **认证**：JWT（jsonwebtoken）+ bcryptjs
+- **沙箱**：Node.js `vm` 模块（Edge Functions）
+- **SSL**：通过 Node.js `crypto` 生成自签名证书
+- **测试**：Vitest（单元）+ Playwright（E2E）
+- **部署**：多阶段 Docker + Docker Compose
 
-## License
+## 许可证
 
 ISC
