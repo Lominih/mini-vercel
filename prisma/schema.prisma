@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+  
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  projects  Project[]
+  teams     TeamMember[]
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  members   TeamMember[]
+  projects  Project[]
+}
+
+model TeamMember {
+  id       String @id @default(uuid())
+  teamId   String
+  userId   String
+  role     String @default("member")
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model Project {
+  id              String   @id @default(uuid())
+  name            String
+  framework       String?
+  buildCommand    String?
+  outputDir       String?
+  installCommand  String?
+  rootDirectory   String?
+  userId          String?
+  teamId          String?
+  githubRepoId    String?
+  githubRepoName  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  team            Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  deployments     Deployment[]
+  domains         Domain[]
+  envVars         EnvVar[]
+  edgeFunctions   EdgeFunction[]
+  redirectRules   RedirectRule[]
+}
+
+model Deployment {
+  id          String    @id @default(uuid())
+  projectId   String
+  status      String    @default("pending")
+  url         String?
+  branch      String?
+  commitSha   String?
+  commitMsg   String?
+  buildLog    String    @default("")
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Domain {
+  id        String    @id @default(uuid())
+  projectId String
+  name      String
+  verified  Boolean   @default(false)
+  sslStatus String    @default("none")
+  sslCert   String?
+  sslKey    String?
+  sslExpiry DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([name])
+}
+
+model EnvVar {
+  id        String   @id @default(uuid())
+  projectId String
+  key       String
+  value     String
+  encrypted Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, key])
+}
+
+model EdgeFunction {
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  path      String
+  runtime   String   @default("nodejs")
+  code      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, path])
+}
+
+model RedirectRule {
+  id            String   @id @default(uuid())
+  projectId     String
+  source        String
+  target        String
+  statusCode    Int      @default(301)
+  regex         Boolean  @default(false)
+  preserveQuery Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,52 @@
+﻿services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mini-vercel-api
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://minivercel:minivercel@postgres:5432/mini_vercel
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-30d}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3001}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - WEBHOOK_BASE_URL=${WEBHOOK_BASE_URL:-http://localhost:3000}
+      - ENV_ENCRYPTION_KEY=${ENV_ENCRYPTION_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - mini-vercel
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: mini-vercel-postgres
+    environment:
+      POSTGRES_USER: minivercel
+      POSTGRES_PASSWORD: minivercel
+      POSTGRES_DB: mini_vercel
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-EXEC", "pg_isready -U minivercel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mini-vercel
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  mini-vercel:
+    driver: bridge

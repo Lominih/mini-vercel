@@ -1,0 +1,28 @@
+{
+  "name": "mini-vercel-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for Mini Vercel deployments",
+  "main": "dist/index.js",
+  "bin": {
+    "mini-vercel": "dist/index.js",
+    "mv": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^12.1.0",
+    "form-data": "^4.0.1",
+    "inquirer": "^8.2.6",
+    "mime-types": "^2.1.35",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^2.1.4",
+    "@types/node": "^22.15.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
