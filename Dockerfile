@@ -1,12 +1,13 @@
-# ─── Stage 1: Dependencies + Prisma ─────────────────────────
+﻿# ---- Stage 1: Dependencies + Prisma ----
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --ignore-scripts
 COPY prisma ./prisma
 RUN npx prisma generate
+RUN npx prisma download
 
-# ─── Stage 2: Build ─────────────────────────────────────────
+# ---- Stage 2: Build ----
 FROM deps AS builder
 WORKDIR /app
 COPY tsconfig.json ./
@@ -14,7 +15,7 @@ COPY src ./src
 RUN rm -rf ./src/__tests__
 RUN npx tsc || true
 
-# ─── Stage 3: Production ────────────────────────────────────
+# ---- Stage 3: Production ----
 FROM node:20-alpine AS production
 ENV NODE_ENV=production
 
