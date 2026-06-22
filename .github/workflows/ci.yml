@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -89,6 +89,8 @@ jobs:
 
       - name: Push database schema
         run: npx prisma db push --force-reset
+        env:
+          DATABASE_URL: "file:./test.db"
 
       - name: Seed test data
         run: npx ts-node prisma/seed.ts
