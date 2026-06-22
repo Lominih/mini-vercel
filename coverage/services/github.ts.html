@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/34</span>
+                <span class='fraction'>0/37</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/34</span>
+                <span class='fraction'>0/37</span>
             </div>
         
             
@@ -234,7 +234,18 @@
 <a name='L169'></a><a href='#L169'>169</a>
 <a name='L170'></a><a href='#L170'>170</a>
 <a name='L171'></a><a href='#L171'>171</a>
-<a name='L172'></a><a href='#L172'>172</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -389,6 +400,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -405,7 +427,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { GitHubRepo, CommitStatus } from "../types";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">﻿import { GitHubRepo, CommitStatus } from "../types";
 &nbsp;
 const GITHUB_CLIENT_ID = <span class="cstat-no" title="statement not covered" >process.env.GITHUB_CLIENT_ID || "placeholder-client-id";</span>
 const GITHUB_CLIENT_SECRET = <span class="cstat-no" title="statement not covered" >process.env.GITHUB_CLIENT_SECRET || "placeholder-client-secret";</span>
@@ -553,7 +575,13 @@ export async function <span class="fstat-no" title="function not covered" >creat
   }
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >parseWebhookPayload(b</span>ody: any): {
+interface GitHubPushBody {
+  ref?: string;
+  head_commit?: { id?: string; message?: string };
+  repository?: { id?: number; name?: string; full_name?: string };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >parseWebhookPayload(b</span>ody: Record&lt;string, unknown&gt;): {
   event: string;
   ref: string;
   commitSha: string;
@@ -564,15 +592,20 @@ export function <span class="fstat-no" title="function not covered" >parseWebhoo
 <span class="cstat-no" title="statement not covered" >    return null;</span>
   }
 &nbsp;
+  const pushBody = <span class="cstat-no" title="statement not covered" >body as unknown as GitHubPushBody;</span>
+<span class="cstat-no" title="statement not covered" >  if (!pushBody.ref || !pushBody.head_commit || !pushBody.repository) {</span>
+<span class="cstat-no" title="statement not covered" >    return null;</span>
+  }
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     event: "push",
-    ref: body.ref,
-    commitSha: body.head_commit.id,
-    commitMessage: body.head_commit.message,
+    ref: pushBody.ref,
+    commitSha: pushBody.head_commit.id ?? "",
+    commitMessage: pushBody.head_commit.message ?? "",
     repository: {
-      id: body.repository.id,
-      name: body.repository.name,
-      full_name: body.repository.full_name,
+      id: pushBody.repository.id ?? 0,
+      name: pushBody.repository.name ?? "",
+      full_name: pushBody.repository.full_name ?? "",
     },
   };
 }
@@ -583,7 +616,7 @@ export function <span class="fstat-no" title="function not covered" >parseWebhoo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-22T11:37:16.453Z
+                at 2026-06-22T15:06:38.392Z
             </div>
         <script src="../prettify.js"></script>
         <script>

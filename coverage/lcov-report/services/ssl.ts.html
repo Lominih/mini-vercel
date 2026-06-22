@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/36</span>
+                <span class='fraction'>0/39</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/34</span>
+                <span class='fraction'>0/37</span>
             </div>
         
             
@@ -175,7 +175,11 @@
 <a name='L110'></a><a href='#L110'>110</a>
 <a name='L111'></a><a href='#L111'>111</a>
 <a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -262,32 +266,36 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import crypto from "crypto";
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">﻿import crypto from "crypto";
 import { prisma } from "../lib/prisma";
 &nbsp;
 export interface Certificate {
@@ -373,20 +381,24 @@ export async function <span class="fstat-no" title="function not covered" >check
     where: { sslStatus: "active", sslExpiry: { not: null } },
   });
 &nbsp;
-  const renewed: string[] = <span class="cstat-no" title="statement not covered" >[];</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  for (const domain of domains) {</span>
-<span class="cstat-no" title="statement not covered" >    if (!domain.sslExpiry) <span class="cstat-no" title="statement not covered" >continue;</span></span>
-&nbsp;
+  const domainsNeedingRenewal = <span class="cstat-no" title="statement not covered" >domains.<span class="fstat-no" title="function not covered" >filter((d</span>omain) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (!domain.sslExpiry) <span class="cstat-no" title="statement not covered" >return false;</span></span>
     const daysUntilExpiry = <span class="cstat-no" title="statement not covered" >Math.ceil(</span>
       (domain.sslExpiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
     );
+<span class="cstat-no" title="statement not covered" >    return daysUntilExpiry &lt;= RENEWAL_THRESHOLD_DAYS;</span>
+  });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (daysUntilExpiry &lt;= RENEWAL_THRESHOLD_DAYS) {</span>
-<span class="cstat-no" title="statement not covered" >      await requestCertificate(domain.id);</span>
-<span class="cstat-no" title="statement not covered" >      renewed.push(domain.name);</span>
+  const results = <span class="cstat-no" title="statement not covered" >await Promise.allSettled(</span>
+    domainsNeedingRenewal.<span class="fstat-no" title="function not covered" >map((d</span>omain) =&gt; <span class="cstat-no" title="statement not covered" >requestCertificate(domain.id))</span>
+  );
+&nbsp;
+  const renewed: string[] = <span class="cstat-no" title="statement not covered" >[];</span>
+<span class="cstat-no" title="statement not covered" >  results.<span class="fstat-no" title="function not covered" >forEach((r</span>esult, index) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (result.status === "fulfilled") {</span>
+<span class="cstat-no" title="statement not covered" >      renewed.push(domainsNeedingRenewal[index].name);</span>
     }
-  }
+  });
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return renewed;</span>
 }
@@ -398,7 +410,7 @@ export function <span class="fstat-no" title="function not covered" >getCertific
 export function <span class="fstat-no" title="function not covered" >getSSLStatus(d</span>omainId: string): Promise&lt;string | null&gt; {
 <span class="cstat-no" title="statement not covered" >  return prisma.domain</span>
     .findUnique({ where: { id: domainId }, select: { sslStatus: true } })
-    .<span class="fstat-no" title="function not covered" >then((d</span>) =&gt; <span class="cstat-no" title="statement not covered" >d?.sslStatus ?? null)</span>;
+    .<span class="fstat-no" title="function not covered" >then((d</span>: { sslStatus: string | null } | null) =&gt; <span class="cstat-no" title="statement not covered" >d?.sslStatus ?? null)</span>;
 }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -406,7 +418,7 @@ export function <span class="fstat-no" title="function not covered" >getSSLStatu
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-22T11:37:16.428Z
+                at 2026-06-22T15:06:38.353Z
             </div>
         <script src="../prettify.js"></script>
         <script>

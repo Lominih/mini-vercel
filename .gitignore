@@ -1,5 +1,30 @@
-node_modules
-# Keep environment variables out of version control
+﻿node_modules
+coverage/
 .env
+.env.*
+!.env.example
 
+# Prisma
 /src/generated/prisma
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+dist/
+build/
+
+# Docker
+builds/
+deployments/
+sites/
+logs/
