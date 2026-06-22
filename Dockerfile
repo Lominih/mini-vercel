@@ -2,7 +2,8 @@
 FROM node:20-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install --ignore-scripts
+RUN apt-get update -y && apt-get install -y python3 make g++ openssl && rm -rf /var/lib/apt/lists/*
+RUN npm install
 COPY prisma ./prisma
 RUN npx prisma generate
 
