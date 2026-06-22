@@ -93,7 +93,7 @@ jobs:
           DATABASE_URL: "file:./test.db"
 
       - name: Seed test data
-        run: npx ts-node prisma/seed.ts
+        run: npx ts-node --compiler-options {"types":["node"],"skipLibCheck":true} prisma/seed.ts
 
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
