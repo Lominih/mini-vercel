@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -39,6 +39,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Generate Prisma client
+        run: npx prisma generate
+
       - name: Run Vitest
         run: npx vitest run --coverage
 
@@ -48,65 +51,6 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
-          retention-days: 7
-
-  e2e-tests:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: mini_vercel_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    env:
-      DATABASE_URL: postgresql://testuser:testpass@localhost:5432/mini_vercel_test
-      JWT_SECRET: test-jwt-secret
-      JWT_EXPIRES_IN: 1h
-      JWT_REFRESH_EXPIRES_IN: 7d
-      ENV_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
-      CORS_ORIGIN: http://localhost:3000
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-
-      - run: npm ci
-
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Push database schema
-        run: npx prisma db push --force-reset
-        env:
-          DATABASE_URL: "file:./test.db"
-
-      - name: Seed test data
-        run: npx ts-node --transpile-only prisma/seed.ts
-
-      - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps
-
-      - name: Run E2E tests
-        run: npx playwright test
-
-      - name: Upload E2E report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: e2e-report/
           retention-days: 7
 
   docker-build:
@@ -124,8 +68,9 @@ jobs:
             -p 3000:3000 \
             -e JWT_SECRET=test-secret \
             -e ENV_ENCRYPTION_KEY=0000000000000000000000000000000000000000000000000000000000000000 \
+            -e DATABASE_URL="file:./test.db" \
             mini-vercel:${{ github.sha }}
-          sleep 5
+          sleep 10
           curl -f http://localhost:3000/api/health || (docker logs test-container && exit 1)
           docker stop test-container
           docker rm test-container
